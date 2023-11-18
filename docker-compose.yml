@@ -1,0 +1,36 @@
+---
+version: '3.3'
+
+services:
+  meilisearch:
+    image: getmeili/meilisearch:v1.4
+    container_name: meilisearch
+    restart: always
+    volumes:
+      - meilisearch_data:/meili_data
+    ports:
+      - 7700:7700
+
+  continuedev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PIP_INDEX_URL: "http://127.0.0.1:9191/index/" # Optional
+        PIP_TRUSTED_HOSTS: "10.0.0.6" # Optional
+    container_name: continuedev
+    restart: always
+    environment:
+      - MEILISEARCH_URL=http://127.0.0.1:7700
+      - CONTINUE_PORT=65432
+      - CONTINUE_HOST=0.0.0.0
+    volumes:
+      - continue_data:/home/continue/.continue
+    ports:
+      - 65432:65432
+    depends_on:
+      - meilisearch
+
+volumes:
+  continue_data: {}
+  meilisearch_data: {}
