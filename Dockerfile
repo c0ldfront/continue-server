@@ -1,6 +1,6 @@
 ARG BASE_IMAGE=python:3.10-slim
 ARG COMMIT_SHA=""
-ARG BUILD_BRANCH=""
+ARG COMMIT_BRANCH=""
 ARG BUILD_VERSION=""
 ARG BUILD_CREATED=""
 
@@ -8,18 +8,17 @@ ARG BUILD_CREATED=""
 FROM ${BASE_IMAGE}
 
 # Set labels for the image with commit SHA and version
-LABEL org.opencontainers.image.revision=${COMMIT_SHA} \
-    org.opencontainers.image.version=${BUILD_VERSION} \
-    org.opencontainers.image.created=${BUILD_CREATED}
+LABEL org.opencontainers.image.revision=${COMMIT_SHA}
+# LABEL org.opencontainers.image.version=${BUILD_VERSION}
 
 ARG PUID="1000"
 ARG GUID="1000"
 
 # Build information
-ENV ENV COMMIT_SHA=${COMMIT_SHA} \
-    BUILD_BRANCH=${BUILD_BRANCH} \
-    BUILD_VERSION=${BUILD_VERSION} \
-    BUILD_CREATED=${BUILD_CREATED}
+ENV COMMIT_SHA=${COMMIT_SHA}
+ENV COMMIT_BRANCH=${COMMIT_BRANCH}
+# ENV BUILD_VERSION=${BUILD_VERSION}
+# ENV BUILD_CREATED=${BUILD_CREATED}
 
 # Environment settings
 ENV DEBIAN_FRONTEND=noninteractive \
