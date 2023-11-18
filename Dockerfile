@@ -56,6 +56,9 @@ RUN chmod +x /app/start-continuedev.sh
 # Add the entry-point script
 COPY --chmod=0755 entrypoint.sh /entrypoint.sh
 
+RUN mkdir /home/continue/.continue
+RUN chown -R continue:$GUID /home/continue/.continue
+
 # Expose the application port
 EXPOSE 65432
 
@@ -64,7 +67,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD if [ "$NO_HEALTHCHECK" = "NONE" ]; then exit 0; else curl -f http://localhost:$CONTINUE_PORT/health || exit 1; fi
 
 # Set tini as the entry-point
-ENTRYPOINT ["/usr/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
 
 # Command to run the server using the startup script
 CMD ["/app/start-continuedev.sh"]
