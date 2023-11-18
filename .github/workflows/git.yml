@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+
+jobs:
+  buildx:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Calculate Short SHA
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_ENV
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.SHORT_SHA }}
+          labels: |
+            org.opencontainers.image.revision="${{ github.sha }}"
+            org.opencontainers.image.source="${{ github.server_url }}/${{ github.repository }}"
